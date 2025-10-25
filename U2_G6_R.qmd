@@ -1,0 +1,141 @@
+---
+title: "Análisis de datos"
+author: "Chuquizuta Poquioma Shirley,  García López Llian Carlos,  Montoya Vargas Oscar Enrique,  Tuesta Melendez Lleily Consuelo"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+# Diseñar el experimento
+
+$$alt_plant = \mu + t + bloq + e$$
+
+# Cargar los paquetes
+```{r}
+library(tidyverse)
+library(googlesheets4)
+library(emmeans)
+library(multcomp)
+library(multcompView)
+library(knitr)
+```
+# Importar los datos
+```{r}
+url <- "https://docs.google.com/spreadsheets/d/1FsG1M0WFQ8531TRAjBTDFO4uZdZJNI51VYCHsvlx0Jg/edit?gid=1217457001#gid=1217457001"
+
+gs <- url %>% 
+  as_sheets_id()
+
+fb <- gs %>% 
+  range_read("fb") %>% 
+    mutate(across(1:t, ~as.factor(.)))
+str(fb)
+```
+
+# Análisis para alt_plant
+
+## ANOVA
+```{r}
+md <- aov(alt_plant ~ bloq + t, data = fb)
+
+anova(md)
+```
+
+## Comparación de medias
+```{r}
+comparacion <- emmeans(md, ~ t)  # t = tratamientos
+summary(comparacion)
+
+letras <- multcomp::cld(comparacion, Letters = letters, adjust = "tukey")
+
+letras
+
+letras %>% 
+  kable()
+```
+
+## Gráfico
+```{r}
+ggplot(letras, aes(x = t, y = emmean)) +
+  geom_col(fill = "skyblue", width = 0.6) +
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0.2) +
+  geom_text(aes(label = .group), vjust = -0.6, size = 5, color = "black") +
+  labs(
+    title = "Comparación de medias de altura de planta (alt_plant)",
+    x = "Tratamientos",
+    y = "alt_plant"
+  ) +
+  theme_minimal(base_size = 13)
+```
+
+# Análisis para long_raiz
+
+## ANOVA
+```{r}
+md <- aov(long_raiz ~ bloq + t, data = fb)
+
+anova(md)
+```
+
+## Comparación de medias
+```{r}
+comparacion <- emmeans(md, ~ t)  # t = tratamientos
+summary(comparacion)
+
+letras <- multcomp::cld(comparacion, Letters = letters, adjust = "tukey")
+
+letras
+
+letras %>% 
+  kable()
+```
+
+## Gráfico
+```{r}
+ggplot(letras, aes(x = t, y = emmean)) +
+  geom_col(fill = "skyblue", width = 0.6) +
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0.2) +
+  geom_text(aes(label = .group), vjust = -0.6, size = 5, color = "black") +
+  labs(
+    title = "Comparación de medias de longitud de raiz (long_raiz)",
+    x = "Tratamientos",
+    y = "long_raiz"
+  ) +
+  theme_minimal(base_size = 13)
+```
+
+# Análisis para num_nudos
+
+## ANOVA
+```{r}
+md <- aov(num_nudos ~ bloq + t, data = fb)
+
+anova(md)
+```
+
+## Comparación de medias
+```{r}
+comparacion <- emmeans(md, ~ t)  # t = tratamientos
+summary(comparacion)
+
+letras <- multcomp::cld(comparacion, Letters = letters, adjust = "tukey")
+
+letras
+
+letras %>% 
+  kable()
+```
+
+## Gráfico
+```{r}
+ggplot(letras, aes(x = t, y = emmean)) +
+  geom_col(fill = "skyblue", width = 0.6) +
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0.2) +
+  geom_text(aes(label = .group), vjust = -0.6, size = 5, color = "black") +
+  labs(
+    title = "Comparación de medias de número de nudos (num_nudos)",
+    x = "Tratamientos",
+    y = "num_nudos"
+  ) +
+  theme_minimal(base_size = 13)
+```
